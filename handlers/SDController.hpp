@@ -12,14 +12,14 @@ class SDController
 {
   public:
     SDController();
-    virtual void listDirectory(std::string ssid, std::string pass);
-    virtual bool createDirectory(fs::FS &fs, const char *path);
-    virtual bool removeDirectory(fs::FS &fs, const char *path);
-    virtual bool readFile(fs::FS &fs, const char *path);
-    virtual bool writeFile(fs::FS &fs, const char *path, const char *message);
-    virtual bool appendFile(fs::FS &fs, const char *path, const char *message);
-    virtual bool deleteFile(fs::FS &fs, const char *path);
-    virtual bool checkStart(fs::FS &fs, const char *path);
+    virtual void listDirectory(fs::FS &fs, const char *dirname, uint8_t levels);
+    virtual void createDirectory(fs::FS &fs, const char *path);
+    virtual void removeDirectory(fs::FS &fs, const char *path);
+    virtual void readFile(fs::FS &fs, const char *path);
+    virtual void writeFile(fs::FS &fs, const char *path, const char *message);
+    virtual void appendFile(fs::FS &fs, const char *path, const char *message);
+    virtual void deleteFile(fs::FS &fs, const char *path);
+    virtual void checkStart();
 };
 
 }
