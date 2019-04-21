@@ -24,15 +24,16 @@ void setup()
 
 void loop()
 {
-  if (wifiController->isConnected())
-  {
-    Serial.write("Conectado\n");
-    wifiController->sendData("Hola");
-  }
-  else
-  {
-    Serial.write("Conectando...\n");
-    wifiController->tryToConnect();
-  }
+  //if (wifiController->isConnected())
+  //{
+  //  Serial.write("Conectado\n");
+  //  wifiController->sendData("Hola");
+  //}
+  //else
+  //{
+  //  Serial.write("Conectando...\n");
+  //  wifiController->tryToConnect();
+  //}
+  core_->loop();
   delay(200);
 }

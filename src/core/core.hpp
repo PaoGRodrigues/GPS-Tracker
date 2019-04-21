@@ -18,6 +18,8 @@ private:
   WiFiController *wifiController_;
   SDController *sdController_;
   GPSController *gpsController_;
+  unsigned long lastCoordinateTransmitted;
+  bool sendingData;
 };
 
 } // namespace core

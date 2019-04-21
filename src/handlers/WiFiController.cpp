@@ -63,3 +63,8 @@ void WiFiController::sendData(string data)
 
     http.end();
 }
+
+unsigned long WiFiController::getLastCoordinateTransmitted(){
+    //this->sendData("");
+    return 0;
+}
