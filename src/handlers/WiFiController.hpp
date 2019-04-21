@@ -17,9 +17,9 @@ public:
   virtual void sendData(string data);
 
 private:
-  vector<pair<string, string>*>* accessPoints_;
+  vector<pair<string, string> *> *accessPoints_;
   int timeout_;
   int selected_;
 };
 
-} 
+} // namespace handlers
