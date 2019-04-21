@@ -1,10 +1,10 @@
-#include "handlers/WiFiController.cpp"
+#include <Arduino.h>
 #include "handlers/WiFiController.hpp"
 
 using namespace handlers;
 
-char* ssid = "Nacho";
-char* password = "rayandoelsol";
+std::string ssid = "Nacho";
+std::string password = "rayandoelsol";
 WiFiController* wifi;
 
 void setup() {
