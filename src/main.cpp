@@ -5,12 +5,11 @@
 #include "core/Core.hpp"
 
 using namespace handlers;
-using namespace core;
 
 std::string ssid = "Nacho";
 std::string password = "rayandoelsol";
 WiFiController *wifiController;
-Core* core;
+core::Core* core_;
 
 void setup()
 {
@@ -20,7 +19,7 @@ void setup()
   wifiController->addAccessPoint(ssid, password);
   SDController* sdController = new SDController();
   GPSController* gpsController = new GPSController();
-  Core* core = new Core(wifiController, sdController, gpsController);
+  core_ = new core::Core(wifiController, sdController, gpsController);
 }
 
 void loop()
