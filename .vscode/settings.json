@@ -1,0 +1,6 @@
+{
+    "terminal.integrated.env.osx": {
+        "PATH": "/Users/user/.platformio/penv/bin:/Users/user/.platformio/penv:/Users/user/.nvm/versions/node/v12.0.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/user/Library/Android/sdk/tools:/Users/user/Library/Android/sdk/platform-tools:/Users/user/flutter/bin:/Users/user/Documents/personal/universidad/diseno_y_arqui/herramientas/apache-maven-3.5.4/bin",
+        "PLATFORMIO_CALLER": "vscode"
+    }
+}

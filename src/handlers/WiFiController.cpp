@@ -9,13 +9,14 @@ using namespace std;
 WiFiController::WiFiController()
 {
     selected_ = 0;
-    accessPoints_ = new vector<pair<string, string>*>();
+    accessPoints_ = new vector<pair<string, string> *>();
     timeout_ = 0;
 }
 
-void WiFiController::addAccessPoint(string ssid, string pass){
+void WiFiController::addAccessPoint(string ssid, string pass)
+{
 
-    pair<string, string>* aPair = new pair<string, string>(ssid, pass);
+    pair<string, string> *aPair = new pair<string, string>(ssid, pass);
     accessPoints_->push_back(aPair);
 }
 
@@ -61,4 +62,9 @@ void WiFiController::sendData(string data)
     }
 
     http.end();
+}
+
+unsigned long WiFiController::getLastCoordinateTransmitted(){
+    //this->sendData("");
+    return 0;
 }

@@ -5,7 +5,6 @@
 * D2 -
 * D3 SS
 * CMD MOSI
-* VSS GND
 * VDD 3.3V
 * CLK SCK
 * VSS GND
@@ -13,11 +12,15 @@
 * D1 -
 */
 
+#include "Arduino.h"
 #include "SDController.hpp"
+#include "FS.h"
 #include "SD.h"
 #include "SPI.h"
+#include <string>
 
 using namespace handlers;
+using namespace std;
 
 SDController::SDController(){}
 
@@ -171,4 +174,18 @@ void SDController::deleteFile(const char *path)
     {
         Serial.println("Delete failed");
     }
+}
+
+void SDController::saveData(string data)
+{
+}
+
+string SDController::getData(unsigned long position)
+{
+    return "";
+}
+
+unsigned long SDController::getNumberOfData()
+{
+    return 0;
 }
