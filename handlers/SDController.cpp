@@ -14,7 +14,6 @@
 */
 
 #include "SDController.hpp"
-#include "FS.h"
 #include "SD.h"
 #include "SPI.h"
 
@@ -22,19 +21,27 @@ using namespace handlers;
 
 SDController::SDController(){}
 
-void SDController::checkStart()
+bool SDController::checkStart()
 {
     if (!SD.begin())
     {
         Serial.println("Card Mount Failed");
+        return false;
     }
+    uint8_t cardType = SD.cardType();
+    if (cardType == CARD_NONE)
+    {
+        Serial.println("No SD card attached");
+        return false;
+    }
+    return true;
 }
 
-void SDController::listDirectory(fs::FS &fs, const char *dirname, uint8_t levels)
+void SDController::listDirectory(const char *dirname, uint8_t levels)
 {
     Serial.printf("Listing directory: %s\n", dirname);
 
-    File root = fs.open(dirname);
+    File root = SD.open(dirname);
     if (!root)
     {
         Serial.println("Failed to open directory");
@@ -55,7 +62,7 @@ void SDController::listDirectory(fs::FS &fs, const char *dirname, uint8_t levels
             Serial.println(file.name());
             if (levels)
             {
-                listDirectory(fs, file.name(), levels - 1);
+                listDirectory(file.name(), levels - 1);
             }
         }
         else
@@ -69,10 +76,10 @@ void SDController::listDirectory(fs::FS &fs, const char *dirname, uint8_t levels
     }
 }
 
-void SDController::createDirectory(fs::FS &fs, const char *path)
+void SDController::createDirectory(const char *path)
 {
     Serial.printf("Creating Dir: %s\n", path);
-    if (fs.mkdir(path))
+    if (SD.mkdir(path))
     {
         Serial.println("Dir created");
     }
@@ -82,10 +89,10 @@ void SDController::createDirectory(fs::FS &fs, const char *path)
     }
 }
 
-void SDController::removeDirectory(fs::FS &fs, const char *path)
+void SDController::removeDirectory(const char *path)
 {
     Serial.printf("Removing Dir: %s\n", path);
-    if (fs.rmdir(path))
+    if (SD.rmdir(path))
     {
         Serial.println("Dir removed");
     }
@@ -95,11 +102,11 @@ void SDController::removeDirectory(fs::FS &fs, const char *path)
     }
 }
 
-void SDController::readFile(fs::FS &fs, const char *path)
+void SDController::readFile(const char *path)
 {
     Serial.printf("Reading file: %s\n", path);
 
-    File file = fs.open(path);
+    File file = SD.open(path);
     if (!file)
     {
         Serial.println("Failed to open file for reading");
@@ -113,11 +120,11 @@ void SDController::readFile(fs::FS &fs, const char *path)
     }
 }
 
-void SDController::writeFile(fs::FS &fs, const char *path, const char *message)
+void SDController::writeFile(const char *path, const char *message)
 {
     Serial.printf("Writing file: %s\n", path);
 
-    File file = fs.open(path, FILE_WRITE);
+    File file = SD.open(path, FILE_WRITE);
     if (!file)
     {
         Serial.println("Failed to open file for writing");
@@ -133,11 +140,11 @@ void SDController::writeFile(fs::FS &fs, const char *path, const char *message)
     }
 }
 
-void SDController::appendFile(fs::FS &fs, const char *path, const char *message)
+void SDController::appendFile(const char *path, const char *message)
 {
     Serial.printf("Appending to file: %s\n", path);
 
-    File file = fs.open(path, FILE_APPEND);
+    File file = SD.open(path, FILE_APPEND);
     if (!file)
     {
         Serial.println("Failed to open file for appending");
@@ -153,10 +160,10 @@ void SDController::appendFile(fs::FS &fs, const char *path, const char *message)
     }
 }
 
-void SDController::deleteFile(fs::FS &fs, const char *path)
+void SDController::deleteFile(const char *path)
 {
     Serial.printf("Deleting file: %s\n", path);
-    if (fs.remove(path))
+    if (SD.remove(path))
     {
         Serial.println("File deleted");
     }
