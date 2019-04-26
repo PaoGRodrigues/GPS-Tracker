@@ -2,14 +2,12 @@
 * Connect the SD card to the following pins:
 *
 * SD Card | ESP32
-* D2 -
-* D3 SS
-* CMD MOSI
-* VDD 3.3V
-* CLK SCK
-* VSS GND
-* D0 MISO
-* D1 -
+* CS D5
+* MOSI D23
+* 3.3V 3.3V
+* CLK D18
+* GND GND
+* MISO D19
 */
 
 #include "Arduino.h"

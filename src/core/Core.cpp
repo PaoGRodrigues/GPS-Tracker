@@ -13,8 +13,9 @@ Core::Core(WiFiController *wifiController, SDController *sdController, GPSContro
 
 void Core::loop()
 {
+    if(sdController_->checkStart()){
     sdController_->listDirectory("/", 1);
-    /*if (gpsController_->isUpdated())
+      }  /*if (gpsController_->isUpdated())
     {
         string data = gpsController_->getData();
         sdController_->saveData(data);
