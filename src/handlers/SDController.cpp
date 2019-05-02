@@ -38,72 +38,7 @@ bool SDController::checkStart()
     return true;
 }
 
-void SDController::listDirectory(const char *dirname, uint8_t levels)
-{
-    Serial.printf("Listing directory: %s\n", dirname);
-
-    File root = SD.open(dirname);
-    if (!root)
-    {
-        Serial.println("Failed to open directory");
-        return;
-    }
-    if (!root.isDirectory())
-    {
-        Serial.println("Not a directory");
-        return;
-    }
-
-    File file = root.openNextFile();
-    while (file)
-    {
-        if (file.isDirectory())
-        {
-            Serial.print(" DIR : ");
-            Serial.println(file.name());
-            if (levels)
-            {
-                listDirectory(file.name(), levels - 1);
-            }
-        }
-        else
-        {
-            Serial.print(" FILE: ");
-            Serial.print(file.name());
-            Serial.print(" SIZE: ");
-            Serial.println(file.size());
-        }
-        file = root.openNextFile();
-    }
-}
-
-void SDController::createDirectory(const char *path)
-{
-    Serial.printf("Creating Dir: %s\n", path);
-    if (SD.mkdir(path))
-    {
-        Serial.println("Dir created");
-    }
-    else
-    {
-        Serial.println("mkdir failed");
-    }
-}
-
-void SDController::removeDirectory(const char *path)
-{
-    Serial.printf("Removing Dir: %s\n", path);
-    if (SD.rmdir(path))
-    {
-        Serial.println("Dir removed");
-    }
-    else
-    {
-        Serial.println("rmdir failed");
-    }
-}
-
-void SDController::readFile(const char *path)
+void SDController::readFile(const char *path, int dataNumber)
 {
     Serial.printf("Reading file: %s\n", path);
 
@@ -115,10 +50,18 @@ void SDController::readFile(const char *path)
     }
 
     Serial.print("Read from file: ");
-    while (file.available())
+    // dataNumber es el número de registro de dato que quiero leer desde 0.
+    int position = dataNumber * dataSize;
+    int finalPosition = position + dataSize;
+    char *value = new char[dataSize+1];
+    file.seek(position);
+    while (file.available() && position < finalPosition)
     {
-        Serial.write(file.read());
+        value[position] = file.read();
+        position++;
     }
+    value[position] = '\0';
+    Serial.println(value);
 }
 
 void SDController::writeFile(const char *path, const char *message)
