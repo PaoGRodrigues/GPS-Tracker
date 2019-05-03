@@ -20,7 +20,10 @@
 using namespace handlers;
 using namespace std;
 
-SDController::SDController(){}
+SDController::SDController(){
+    File file = SD.open(path);
+    lastDataStore = file.size() / dataSize;
+}
 
 bool SDController::checkStart()
 {
@@ -38,7 +41,7 @@ bool SDController::checkStart()
     return true;
 }
 
-void SDController::readFile(const char *path, int dataNumber)
+char* SDController::readFile(unsigned long dataNumber)
 {
     Serial.printf("Reading file: %s\n", path);
 
@@ -46,13 +49,13 @@ void SDController::readFile(const char *path, int dataNumber)
     if (!file)
     {
         Serial.println("Failed to open file for reading");
-        return;
+        return 0;
     }
 
     Serial.print("Read from file: ");
     // dataNumber es el número de registro de dato que quiero leer desde 0.
-    int position = dataNumber * dataSize;
-    int finalPosition = position + dataSize;
+    unsigned long position = dataNumber * dataSize;
+    unsigned long finalPosition = position + dataSize;
     char *value = new char[dataSize+1];
     file.seek(position);
     while (file.available() && position < finalPosition)
@@ -62,29 +65,10 @@ void SDController::readFile(const char *path, int dataNumber)
     }
     value[position] = '\0';
     Serial.println(value);
+    return value;
 }
 
-void SDController::writeFile(const char *path, const char *message)
-{
-    Serial.printf("Writing file: %s\n", path);
-
-    File file = SD.open(path, FILE_WRITE);
-    if (!file)
-    {
-        Serial.println("Failed to open file for writing");
-        return;
-    }
-    if (file.print(message))
-    {
-        Serial.println("File written");
-    }
-    else
-    {
-        Serial.println("Write failed");
-    }
-}
-
-void SDController::appendFile(const char *path, const char *message)
+void SDController::appendFile(const char *data)
 {
     Serial.printf("Appending to file: %s\n", path);
 
@@ -94,8 +78,16 @@ void SDController::appendFile(const char *path, const char *message)
         Serial.println("Failed to open file for appending");
         return;
     }
-    if (file.print(message))
+    unsigned char* dato = new unsigned char[this->dataSize];
+    size_t dataSize = strlen(data);
+    memcpy(dato, data, dataSize);
+    while (dataSize < this->dataSize) {
+        dato[dataSize] = ' ';
+        dataSize++;
+    }
+    if (file.write(dato, this->dataSize))
     {
+        lastDataStore++;
         Serial.println("Message appended");
     }
     else
@@ -104,7 +96,7 @@ void SDController::appendFile(const char *path, const char *message)
     }
 }
 
-void SDController::deleteFile(const char *path)
+void SDController::deleteFile()
 {
     Serial.printf("Deleting file: %s\n", path);
     if (SD.remove(path))
@@ -117,16 +109,7 @@ void SDController::deleteFile(const char *path)
     }
 }
 
-void SDController::saveData(string data)
-{
-}
-
-string SDController::getData(unsigned long position)
-{
-    return "";
-}
-
 unsigned long SDController::getNumberOfData()
 {
-    return 0;
+    return lastDataStore;
 }

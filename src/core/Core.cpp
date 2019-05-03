@@ -1,5 +1,7 @@
 #include "Core.hpp"
 #include <Arduino.h>
+#include <string>
+#include <sstream>
 using namespace core;
 
 Core::Core(WiFiController *wifiController, SDController *sdController, GPSController *gpsController)
@@ -11,10 +13,18 @@ Core::Core(WiFiController *wifiController, SDController *sdController, GPSContro
     sendingData = false;
 }
 
+unsigned long a = 0;
+
 void Core::loop()
 {
+
+    
     if(sdController_->checkStart()){
-        sdController_->readFile("/prueba.txt", 0);
+        stringstream strs;
+        strs << a;
+        sdController_->appendFile(strs.str().c_str());
+        sdController_->readFile(a);
+        a++;
     }  /*if (gpsController_->isUpdated())
     {
         string data = gpsController_->getData();
