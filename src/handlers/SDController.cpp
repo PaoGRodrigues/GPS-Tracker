@@ -21,7 +21,8 @@
 using namespace handlers;
 using namespace std;
 
-SDController::SDController(){
+SDController::SDController()
+{
     File file = SD.open(path);
     lastDataStore = file.size() / dataSize;
 }
@@ -42,7 +43,7 @@ bool SDController::checkStart()
     return true;
 }
 
-char* SDController::readFile(unsigned long dataNumber)
+char *SDController::readFile(unsigned long dataNumber)
 {
     Serial.printf("Reading file: %s\n", path);
 
@@ -56,9 +57,9 @@ char* SDController::readFile(unsigned long dataNumber)
     Serial.print("Read from file: ");
     // dataNumber es el número de registro de dato que quiero leer desde 0.
     unsigned long position = dataNumber * dataSize;
-    char *value = new char[dataSize+1];
+    char *value = new char[dataSize + 1];
     file.seek(position);
-    
+
     unsigned long readed = 0;
     while (file.available() && readed < dataSize)
     {
@@ -80,10 +81,11 @@ void SDController::appendFile(const char *data)
         Serial.println("Failed to open file for appending");
         return;
     }
-    unsigned char* dato = new unsigned char[this->dataSize];
+    unsigned char *dato = new unsigned char[this->dataSize];
     size_t dataSize = strlen(data);
     memcpy(dato, data, dataSize);
-    while (dataSize < this->dataSize) {
+    while (dataSize < this->dataSize)
+    {
         dato[dataSize] = ' ';
         dataSize++;
     }
