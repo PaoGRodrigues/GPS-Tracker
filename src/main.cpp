@@ -6,34 +6,24 @@
 
 using namespace handlers;
 
-std::string ssid = "Nacho";
-std::string password = "rayandoelsol";
+std::string ssid = "gps_tracker";
+std::string password = "rekcart_spg";
 WiFiController *wifiController;
-core::Core* core_;
+core::Core *core_;
 
 void setup()
 {
   Serial.begin(115200);
-  delay(4000); //Delay needed before calling the WiFi.begin
+  delay(4000);
   wifiController = new WiFiController();
-  wifiController->addAccessPoint(ssid, password);
-  SDController* sdController = new SDController();
-  GPSController* gpsController = new GPSController();
+  wifiController->setAccessPoint(ssid, password);
+  SDController *sdController = new SDController();
+  GPSController *gpsController = new GPSController();
   core_ = new core::Core(wifiController, sdController, gpsController);
 }
 
 void loop()
 {
-  //if (wifiController->isConnected())
-  //{
-  //  Serial.write("Conectado\n");
-  //  wifiController->sendData("Hola");
-  //}
-  //else
-  //{
-  //  Serial.write("Conectando...\n");
-  //  wifiController->tryToConnect();
-  //}
   core_->loop();
   delay(200);
 }

@@ -13,7 +13,7 @@ Core::Core(WiFiController *wifiController, SDController *sdController, GPSContro
     sendingData = false;
 }
 
-const char *const data[15] = {
+const char *const testData[15] = {
     "$GPGGA,012010.813,5231.067,N,01323.931,E,1,12,1.0,0.0,M,0.0,M,,*6A\r\n",
     "$GPGSA,A,3,01,02,03,04,05,06,07,08,09,10,11,12,1.0,1.0,1.0*30\r\n",
     "$GPRMC,012010.813,A,5231.067,N,01323.931,E,038.9,265.8,050519,000.0,W*7D\r\n",
@@ -32,48 +32,31 @@ const char *const data[15] = {
 };
 
 unsigned long datoProcesar = 0;
-unsigned long datoRecuperar = 0;
 
 void Core::loop()
 {
-
-    Serial.print("Dato a Procesar: ");
-    Serial.print(data[datoProcesar]);
-    unsigned char *result = formatGps((unsigned char *)data[datoProcesar]);
-    if (result)
+    if (true) //(gpsController_->isUpdated())
     {
-        Serial.print("Dato procesado: ");
-        Serial.write(result, 29);
-        Serial.println();
-        if (sdController_->checkStart())
+        unsigned char *data = formatGps((unsigned char *)testData[datoProcesar]); //string data = gpsController_->getData();
+        datoProcesar = (datoProcesar + 1) % 15; // Lectura ciclica de los datos de prueba
+        if (data)
         {
-            sdController_->appendFile(result);
-            sdController_->readFile((datoRecuperar * datoRecuperar) % sdController_->getNumberOfData());
+            sdController_->appendFile(data);
         }
-    }
-    datoProcesar++;
-    if (datoProcesar == 15)
-    {
-        datoProcesar = 0;
-    }
-    datoRecuperar++;
-    /*
-    if (gpsController_->isUpdated())
-    {
-        string data = gpsController_->getData();
-        sdController_->saveData(data);
     }
     if (wifiController_->isConnected())
     {
         if (!sendingData)
         {
-            lastCoordinateTransmitted = wifiController_->getLastCoordinateTransmitted();
-            sendingData = true;
+            sendingData = wifiController_->getLastCoordinateTransmitted(&lastCoordinateTransmitted);
         }
-        if (sdController_->getNumberOfData() >= lastCoordinateTransmitted)
+        if (sendingData && sdController_->getNumberOfData() >= lastCoordinateTransmitted)
         {
-            string data = sdController_->getData(lastCoordinateTransmitted++);
-            wifiController_->sendData(data);
+            string data = sdController_->readFile(lastCoordinateTransmitted);
+            if (wifiController_->sendData(data))
+            {
+                lastCoordinateTransmitted++;
+            }
         }
     }
     else
@@ -81,7 +64,6 @@ void Core::loop()
         wifiController_->tryToConnect();
         sendingData = false;
     }
-    */
 }
 
 unsigned char *Core::formatGps(const unsigned char *raw_data)
