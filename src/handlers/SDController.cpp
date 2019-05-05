@@ -16,6 +16,7 @@
 #include "SD.h"
 #include "SPI.h"
 #include <string>
+#include <sstream>
 
 using namespace handlers;
 using namespace std;
@@ -55,15 +56,16 @@ char* SDController::readFile(unsigned long dataNumber)
     Serial.print("Read from file: ");
     // dataNumber es el número de registro de dato que quiero leer desde 0.
     unsigned long position = dataNumber * dataSize;
-    unsigned long finalPosition = position + dataSize;
     char *value = new char[dataSize+1];
     file.seek(position);
-    while (file.available() && position < finalPosition)
+    
+    unsigned long readed = 0;
+    while (file.available() && readed < dataSize)
     {
-        value[position] = file.read();
-        position++;
+        value[readed] = file.read();
+        readed++;
     }
-    value[position] = '\0';
+    value[readed] = '\0';
     Serial.println(value);
     return value;
 }

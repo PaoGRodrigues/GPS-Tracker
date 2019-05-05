@@ -21,7 +21,7 @@ class SDController
 
   private:
     // dataSize es al tamaño de dato almacenado en el registro.
-    unsigned long dataSize = 1;
+    unsigned long dataSize = 10;
     unsigned long lastDataStore = 0;
     const char* path = "/pruebas.txt";
 };
