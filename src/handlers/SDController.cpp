@@ -23,8 +23,15 @@ using namespace std;
 
 SDController::SDController()
 {
-    File file = SD.open(path);
-    lastDataStore = file.size() / dataSize;
+    if (checkStart()) // Pendiente resolver si esto no da true
+    {
+        SD.remove(path); // Para pruebas independientes
+        File file = SD.open(path);
+        lastDataStore = file.size() / dataSize;
+        file.close();
+        Serial.print("Cantidad de datos existentes: ");
+        Serial.println(lastDataStore);
+    }
 }
 
 bool SDController::checkStart()
@@ -63,15 +70,14 @@ char *SDController::readFile(unsigned long dataNumber)
     unsigned long readed = 0;
     while (file.available() && readed < dataSize)
     {
-        value[readed] = file.read();
-        readed++;
+        value[readed++] = file.read();
     }
     value[readed] = '\0';
     Serial.println(value);
     return value;
 }
 
-void SDController::appendFile(const char *data)
+void SDController::appendFile(unsigned char *data)
 {
     Serial.printf("Appending to file: %s\n", path);
 
@@ -81,15 +87,16 @@ void SDController::appendFile(const char *data)
         Serial.println("Failed to open file for appending");
         return;
     }
-    unsigned char *dato = new unsigned char[this->dataSize];
-    size_t dataSize = strlen(data);
-    memcpy(dato, data, dataSize);
-    while (dataSize < this->dataSize)
-    {
-        dato[dataSize] = ' ';
-        dataSize++;
-    }
-    if (file.write(dato, this->dataSize))
+    // unsigned char *dato = new unsigned char[this->dataSize];
+    // size_t dataSize = strlen(data);
+    // memcpy(dato, data, dataSize);
+    // while (dataSize < this->dataSize)
+    // {
+    //     dato[dataSize] = ' ';
+    //     dataSize++;
+    // }
+    // if (file.write(dato, this->dataSize))
+    if (file.write(data, dataSize))
     {
         lastDataStore++;
         Serial.println("Message appended");

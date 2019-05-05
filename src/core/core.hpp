@@ -13,6 +13,7 @@ class Core
 public:
   Core(WiFiController *wifiController, SDController *sdController, GPSController *gpsController);
   virtual void loop();
+  virtual unsigned char *formatGps(const unsigned char *rawInput);
 
 private:
   WiFiController *wifiController_;
