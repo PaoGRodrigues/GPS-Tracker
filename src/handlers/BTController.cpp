@@ -39,11 +39,11 @@ void BTController::setup(char *nombre){
 
 string BTController::readData(){
 
-  stringstream input;
-  while () //Corrobora si está activo
-  {
-     input << ESP_BT->read(); //Lee lo que está recibiendo
-    Serial.print("Received:"); 
-    Serial.println(input.str().c_str());
-  }
+  // stringstream input;
+  // while () //Corrobora si está activo
+  // {
+  //    input << ESP_BT->read(); //Lee lo que está recibiendo
+  //   Serial.print("Received:"); 
+  //   Serial.println(input.str().c_str());
+  // }
 }

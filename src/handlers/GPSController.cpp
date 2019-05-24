@@ -1,14 +1,16 @@
 #include "GPSController.hpp"
 #include "HardwareSerial.h"
 #include <sstream>
-#define RXD2 16
-#define TXD2 17
-
 using namespace handlers;
 using namespace std;
 
+
+HardwareSerial gps_serial(2);
+
 GPSController::GPSController()
 {
+
+    gps_serial.begin(9600);
 }
 
 bool GPSController::isUpdated()
@@ -16,11 +18,9 @@ bool GPSController::isUpdated()
     return false;
 }
 
-string crearJson(string GPSString)
+string GPSController::createJson(string GPSString)
 {
-    DynamicJsonDocument json(1024);
-
-// Documentacion: https://www.winsystems.com/wp-content/uploads/software/nmea.pdf
+    // Documentacion: https://www.winsystems.com/wp-content/uploads/software/nmea.pdf
     // Ejemplo
     // $GPGGA,012010.813,5231.067,N,01323.931,E,1,12,1.0,0.0,M,0.0,M,,*6A\r\n,
     // !LOS VALORES DECIMALES DESPUES DEL PUNTO SON OPCIONALES, VALIDAR CON NUESTRO GPS!
@@ -32,46 +32,51 @@ string crearJson(string GPSString)
     // Este-Oeste, 39, 1
     // LongitudTotal 29
 
-    std::replace(GPSString.begin(), GPSString.end(), ':', ' ');  // replace ':' by ' '
+    string keys[16] = {"{\"$GPGGA\":\"", "\",\"horario\":\"", "\",\"latitud\":\"", "\",\"latitudhemisferio\":\"", "\",\"longitud\":\"", "\",\"longitudhemisferio\":\"",
+        "\",\"indicadorcalidad\":\"", "\",\"satelites\":\"", "\",\"HDOP\":\"", "\",\"alturaantena\":\"", "\",\"MetersM\":\"", "\",\"separacion\":\"", "\",\"MetersM2\":\"",
+        "\",\"diferenciahoraria\":\"", "\",\"diferenciaestacion\":\"", "\",\"checksum\":\""};
+    String gpsString = GPSString.c_str();
+    int from = 0;
+    String value = "";
+    int pos = 0;
+    String temp = "";
 
-    vector<string> array;
-    std::stringstream ss(GPSString);
-    string temp;
-
-    string keys[16] = {"$GPGGA", "horario", "latitud", "latitudhemisferio", "longitud", "longitudhemisferio",
-        "indicadorcalidad", "satelites", "HDOP", "alturaantena", "MetersM", "separacion", "MetersM2",
-        "diferenciahoraria", "diferenciaestacion", "checksum"};
-
-    int i = 0;
-    while (ss >> temp)
-        json[i] = temp;
-        i++;
-
-    //falta convertir el json a string
-    return json;
+    while(from != -1) {
+        int to = gpsString.indexOf(",", from);
+        if (to != -1){
+            value = gpsString.substring(from, to);
+            to+=1;
+        } else {
+            value = gpsString.substring(from);
+        }
+        String key = keys[pos].c_str();
+        pos++;
+        temp += key+value;
+        from = to;
+    }
+    temp += "\"}";
+    return temp.c_str();
 }
 
 string GPSController::getData()
 {
-    //For Holding the GPS Serial Data
     char buffer[256];
     int count = 0;
-    
-    HardwareSerial gps_serial(2);
 
-    gps_serial.begin(9600, SERIAL_8N1, RXD2, TXD2);
-    Serial.begin(115200);
-    
+    Serial.println("START----------");
+    Serial.println(gps_serial.available());
     while (gps_serial.available()) {
-        buffer[count++] = gps_serial.read();
-        if (count == 256) {
-        break;
-        }
+        Serial.println(gps_serial.readStringUntil('\n'));
+        // buffer[count++] = gps_serial.readStringUntil("\n");
+        // Serial.println(buffer[count-1]);
+        // if (count == 256) {
+        //     break;
+        // }
     }
 
     string stringBuffer = (const char*)buffer;
 
-    string json = crearJson(stringBuffer);
+    // string json = createJson(stringBuffer);
 
-    return json;
+    return stringBuffer;
 }

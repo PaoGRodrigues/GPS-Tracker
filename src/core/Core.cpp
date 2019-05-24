@@ -37,13 +37,22 @@ void Core::loop()
 {
     if (true) //(gpsController_->isUpdated())
     {
-        unsigned char *data = formatGps((unsigned char *)testData[datoProcesar]); //string data = gpsController_->getData();
-        datoProcesar = (datoProcesar + 1) % 15; // Lectura ciclica de los datos de prueba
-        if (data)
+        // const char *data12 = testData[datoProcesar]; //
+        // string data3 = data12;
+        // char messageType[] = "$GPGGA";
+        // datoProcesar = (datoProcesar + 1) % 15; // Lectura ciclica de los datos de prueba
+        // if (memcmp(messageType, data12, sizeof(messageType) - 1))
+        // {
+        //     return;
+        // }
+        string data = gpsController_->getData();
+        Serial.println(data.c_str());
+        if (data.c_str())
         {
-            sdController_->appendFile(data);
+            // sdController_->appendFile(data.c_str());
         }
     }
+    return;
     if (wifiController_->isConnected())
     {
         if (!sendingData)

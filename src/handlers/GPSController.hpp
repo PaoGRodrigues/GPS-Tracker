@@ -17,6 +17,8 @@ class GPSController
     virtual bool isUpdated();
     // Retorna la informacion almacenada
     virtual string getData();
+    // Convierte un dato de GPS en un string Json
+    virtual string createJson(string GPSString);
 };
  // namespace handlers
 }

@@ -17,9 +17,9 @@ void setup()
   delay(4000);
   wifiController = new WiFiController();
   wifiController->setAccessPoint(ssid, password);
-  SDController *sdController = new SDController();
+  //SDController *sdController = new SDController();
   GPSController *gpsController = new GPSController();
-  core_ = new core::Core(wifiController, sdController, gpsController);
+  core_ = new core::Core(wifiController, 0, gpsController);
 }
 
 void loop()
