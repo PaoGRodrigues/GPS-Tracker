@@ -64,10 +64,22 @@ void Core::loop()
         }
         if (sendingData && sdController_->getNumberOfData() >= lastCoordinateTransmitted)
         {
-            string data = sdController_->readFile(lastCoordinateTransmitted);
-            if (wifiController_->sendData(data))
+            int coordinate = lastCoordinateTransmitted;
+            stringstream data;
+            data << "{ \"new_items\":[";
+            data << sdController_->readFile(coordinate);
+            coordinate++;
+            while (coordinate <= sdController_->getNumberOfData()){
+                data << ",";
+                data << sdController_->readFile(coordinate);
+                coordinate++;
+            }
+            data << "],\"total\":";
+            data << (coordinate - lastCoordinateTransmitted);
+            data << "}";
+            if (wifiController_->sendData(data.str()))
             {
-                lastCoordinateTransmitted++;
+                coordinate = lastCoordinateTransmitted;
             }
         }
     }
