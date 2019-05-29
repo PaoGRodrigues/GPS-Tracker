@@ -32,9 +32,9 @@ string GPSController::createJson(string GPSString)
     // Este-Oeste, 39, 1
     // LongitudTotal 29
 
-    string keys[16] = {"{\"$GPGGA\":\"", "\",\"horario\":\"", "\",\"latitud\":\"", "\",\"latitudhemisferio\":\"", "\",\"longitud\":\"", "\",\"longitudhemisferio\":\"",
-        "\",\"indicadorcalidad\":\"", "\",\"satelites\":\"", "\",\"HDOP\":\"", "\",\"alturaantena\":\"", "\",\"MetersM\":\"", "\",\"separacion\":\"", "\",\"MetersM2\":\"",
-        "\",\"diferenciahoraria\":\"", "\",\"diferenciaestacion\":\"", "\",\"checksum\":\""};
+    string keys[16] = {"{\"$GPRMC\":\"", "\",\"horario\":\"", "\",\"estado\":\"", "\",\"latitud\":\"", "\",\"latitudhemisferio\":\"", "\",\"longitud\":\"",
+        "\",\"longitudhemisferio\":\"", "\",\"velocidadtierra\":\"", "\",\"track\":\"", "\",\"diacalendario\":\"", "\",\"variacionmagnetica\":\"", "\",\"variaciondireccion\":\"", 
+        "\",\"posicionsistema\":\"","\",\"checksum\":\""};
     String gpsString = GPSString.c_str();
     int from = 0;
     String value = "";

@@ -77,11 +77,13 @@ void Core::loop()
 
 unsigned char *Core::formatGps(const unsigned char *raw_data)
 {
-    char messageType[] = "$GPGGA";
+    char messageType[] = "$GPRMC";
     if (memcmp(messageType, raw_data, sizeof(messageType) - 1))
     {
         return 0;
     }
+
+    
     // Documentacion: https://www.winsystems.com/wp-content/uploads/software/nmea.pdf
     // Ejemplo
     // $GPGGA,012010.813,5231.067,N,01323.931,E,1,12,1.0,0.0,M,0.0,M,,*6A\r\n,
