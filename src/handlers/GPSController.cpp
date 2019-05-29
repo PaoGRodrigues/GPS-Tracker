@@ -66,12 +66,12 @@ bool GPSController::getData(string* data)
 
     string readed;
 
-    Serial.println("START----------");
-    Serial.println(gps_serial.available());
+    // Serial.println("START----------");
+    // Serial.println(gps_serial.available());
     if(gps_serial.available())
     {
         readed = gps_serial.readStringUntil('\n').c_str();
-        Serial.println(readed.c_str());
+        // Serial.println(readed.c_str());
         newData = readed.compare(lastMessage) != 0 && validarTrama(readed);
         if(newData) {
             lastMessage = readed;
@@ -96,9 +96,10 @@ bool GPSController::getData(string* data)
 bool GPSController::validarTrama(string data)
 {
     char messageType[] = "$GPRMC";
-    bool valido = memcmp(messageType, data.c_str(), sizeof(messageType) - 1);
+    bool valido = memcmp(messageType, data.c_str(), sizeof(messageType) - 1) == 0;
     if(valido)
     {
+        Serial.println(data.c_str());
         int pos = data.find(",", 0) + 1;
         pos = data.find(",", pos) + 1;
         char status = data.at(pos);
