@@ -9,7 +9,7 @@ HardwareSerial gps_serial(2);
 
 GPSController::GPSController()
 {
-
+    lastMessage = "";
     gps_serial.begin(9600);
 }
 
@@ -58,15 +58,27 @@ string GPSController::createJson(string GPSString)
     return temp.c_str();
 }
 
-string GPSController::getData()
+bool GPSController::getData(string* data)
 {
     char buffer[256];
     int count = 0;
+    bool newData = false;
+
+    string readed;
 
     Serial.println("START----------");
     Serial.println(gps_serial.available());
-    while (gps_serial.available()) {
-        Serial.println(gps_serial.readStringUntil('\n'));
+    if(gps_serial.available())
+    {
+        readed = gps_serial.readStringUntil('\n').c_str();
+        Serial.println(readed.c_str());
+        newData = readed.compare(lastMessage) != 0 && validarTrama(readed);
+        if(newData) {
+            lastMessage = readed;
+            *data = createJson(readed);
+        }
+        //while (gps_serial.available()) {
+        //Serial.println(gps_serial.readStringUntil('\n'));
         // buffer[count++] = gps_serial.readStringUntil("\n");
         // Serial.println(buffer[count-1]);
         // if (count == 256) {
@@ -74,9 +86,25 @@ string GPSController::getData()
         // }
     }
 
-    string stringBuffer = (const char*)buffer;
+    //string stringBuffer = (const char*)buffer;
 
     // string json = createJson(stringBuffer);
 
-    return stringBuffer;
+    return newData;
+}
+
+bool GPSController::validarTrama(string data)
+{
+    char messageType[] = "$GPRMC";
+    bool valido = memcmp(messageType, data.c_str(), sizeof(messageType) - 1);
+    if(valido)
+    {
+        int pos = data.find(",", 0) + 1;
+        pos = data.find(",", pos) + 1;
+        char status = data.at(pos);
+        Serial.print("Status: ");
+        Serial.println(status);
+        valido = status == 'A';
+    }
+    return valido;
 }

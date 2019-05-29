@@ -45,10 +45,13 @@ void Core::loop()
         // {
         //     return;
         // }
-        string data = gpsController_->getData();
-        Serial.println(data.c_str());
-        if (data.c_str())
-        {
+        //string data = gpsController_->getData();
+        //Serial.println(data.c_str());
+        //if (data.c_str())
+        //{
+        //}
+        string data;
+        if(gpsController_->getData(&data)) {
             // sdController_->appendFile(data.c_str());
         }
     }
