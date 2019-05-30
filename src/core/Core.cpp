@@ -52,10 +52,9 @@ void Core::loop()
         //}
         string data;
         if(gpsController_->getData(&data)) {
-            // sdController_->appendFile(data.c_str());
+            sdController_->appendFile(data);
         }
     }
-    return;
     if (wifiController_->isConnected())
     {
         if (!sendingData)

@@ -17,6 +17,7 @@
 #include "SPI.h"
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 using namespace handlers;
 using namespace std;
@@ -77,9 +78,12 @@ char *SDController::readFile(unsigned long dataNumber)
     return value;
 }
 
-void SDController::appendFile(unsigned char *data)
+void SDController::appendFile(string data)
 {
     Serial.printf("Appending to file: %s\n", path);
+
+    string paddedData = data;
+    paddedData.insert(0, dataSize - paddedData.size(), ' ');
 
     File file = SD.open(path, FILE_APPEND);
     if (!file)
@@ -96,7 +100,7 @@ void SDController::appendFile(unsigned char *data)
     //     dataSize++;
     // }
     // if (file.write(dato, this->dataSize))
-    if (file.write(data, dataSize))
+    if (file.write((unsigned char*)paddedData.c_str(), dataSize))
     {
         lastDataStore++;
         Serial.println("Message appended");
