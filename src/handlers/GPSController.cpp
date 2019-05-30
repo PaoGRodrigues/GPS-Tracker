@@ -4,6 +4,7 @@
 using namespace handlers;
 using namespace std;
 
+// int THE_WALL = 0;
 
 HardwareSerial gps_serial(2);
 
@@ -70,7 +71,8 @@ bool GPSController::getData(string* data)
     // Serial.println(gps_serial.available());
     if(gps_serial.available())
     {
-        readed = gps_serial.readStringUntil('\n').c_str();
+        readed = gps_serial.readStringUntil('\r').c_str();
+        gps_serial.read();
         // Serial.println(readed.c_str());
         newData = readed.compare(lastMessage) != 0 && validarTrama(readed);
         if(newData) {
@@ -97,6 +99,8 @@ bool GPSController::validarTrama(string data)
 {
     char messageType[] = "$GPRMC";
     bool valido = memcmp(messageType, data.c_str(), sizeof(messageType) - 1) == 0;
+    // THE_WALL++;
+    // if (THE_WALL == 10)
     if(valido)
     {
         Serial.println(data.c_str());

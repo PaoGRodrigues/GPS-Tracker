@@ -73,7 +73,9 @@ bool WiFiController::sendData(string data)
     HTTPClient http;
     Serial.print("POST:");
     Serial.println(url_post.c_str());
+    Serial.println(data.c_str());
     http.begin(url_post.c_str());
+    http.addHeader("Content-Type", "text/plain");
     int httpCode = http.POST(data.c_str());
 
     Serial.print("httpCode:");

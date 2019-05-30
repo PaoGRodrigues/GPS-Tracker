@@ -26,7 +26,7 @@ SDController::SDController()
 {
     if (checkStart()) // Pendiente resolver si esto no da true
     {
-        SD.remove(path); // Para pruebas independientes
+        this->deleteFile(); // Para pruebas independientes
         File file = SD.open(path);
         lastDataStore = file.size() / dataSize;
         file.close();

@@ -7,7 +7,7 @@
 using namespace handlers;
 
 std::string ssid = "gps_tracker";
-std::string password = "rekcart_spg";
+std::string password = "test1234";
 WiFiController *wifiController;
 core::Core *core_;
 
@@ -17,9 +17,9 @@ void setup()
   delay(4000);
   wifiController = new WiFiController();
   wifiController->setAccessPoint(ssid, password);
-  //SDController *sdController = new SDController();
+  SDController *sdController = new SDController();
   GPSController *gpsController = new GPSController();
-  core_ = new core::Core(wifiController, 0, gpsController);
+  core_ = new core::Core(wifiController, sdController, gpsController);
 }
 
 void loop()
