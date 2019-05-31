@@ -78,7 +78,7 @@ void Core::loop()
             data << "}";
             if (wifiController_->sendData(data.str()))
             {
-                coordinate = lastCoordinateTransmitted;
+                lastCoordinateTransmitted = coordinate;
             }
         }
     }

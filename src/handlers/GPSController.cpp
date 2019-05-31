@@ -98,11 +98,11 @@ bool GPSController::getData(string* data)
 bool GPSController::validarTrama(string data)
 {
     char messageType[] = "$GPRMC";
+    // bool valido = memcmp(messageType, data.c_str(), sizeof(messageType) - 1) == 0 && THE_WALL++ == 10000;
     bool valido = memcmp(messageType, data.c_str(), sizeof(messageType) - 1) == 0;
-    // THE_WALL++;
-    // if (THE_WALL == 10)
     if(valido)
     {
+        // THE_WALL = 0;
         Serial.println(data.c_str());
         int pos = data.find(",", 0) + 1;
         pos = data.find(",", pos) + 1;
