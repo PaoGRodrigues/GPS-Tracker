@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <string>
 #include <sstream>
+
 using namespace core;
 
 Core::Core(WiFiController *wifiController, SDController *sdController, GPSController *gpsController)
@@ -13,47 +14,12 @@ Core::Core(WiFiController *wifiController, SDController *sdController, GPSContro
     sendingData = false;
 }
 
-const char *const testData[15] = {
-    "$GPGGA,012010.813,5231.067,N,01323.931,E,1,12,1.0,0.0,M,0.0,M,,*6A\r\n",
-    "$GPGSA,A,3,01,02,03,04,05,06,07,08,09,10,11,12,1.0,1.0,1.0*30\r\n",
-    "$GPRMC,012010.813,A,5231.067,N,01323.931,E,038.9,265.8,050519,000.0,W*7D\r\n",
-    "$GPGGA,012011.813,5231.066,N,01323.914,E,1,12,1.0,0.0,M,0.0,M,,*6D\r\n",
-    "$GPGSA,A,3,01,02,03,04,05,06,07,08,09,10,11,12,1.0,1.0,1.0*30\r\n",
-    "$GPRMC,012011.813,A,5231.066,N,01323.914,E,038.9,265.8,050519,000.0,W*7A\r\n",
-    "$GPGGA,012012.813,5231.065,N,01323.896,E,1,12,1.0,0.0,M,0.0,M,,*66\r\n",
-    "$GPGSA,A,3,01,02,03,04,05,06,07,08,09,10,11,12,1.0,1.0,1.0*30\r\n",
-    "$GPRMC,012012.813,A,5231.065,N,01323.896,E,038.9,265.8,050519,000.0,W*71\r\n",
-    "$GPGGA,012013.813,5231.063,N,01323.879,E,1,12,1.0,0.0,M,0.0,M,,*60\r\n",
-    "$GPGSA,A,3,01,02,03,04,05,06,07,08,09,10,11,12,1.0,1.0,1.0*30\r\n",
-    "$GPRMC,012013.813,A,5231.063,N,01323.879,E,038.9,265.8,050519,000.0,W*77\r\n",
-    "$GPGGA,012014.813,5231.062,N,01323.861,E,1,12,1.0,0.0,M,0.0,M,,*6F\r\n",
-    "$GPGSA,A,3,01,02,03,04,05,06,07,08,09,10,11,12,1.0,1.0,1.0*30\r\n",
-    "$GPRMC,012014.813,A,5231.062,N,01323.861,E,038.9,265.8,050519,000.0,W*78\r\n",
-};
-
-unsigned long datoProcesar = 0;
-
 void Core::loop()
 {
-    if (true) //(gpsController_->isUpdated())
+    string data;
+    if (gpsController_->getData(&data))
     {
-        // const char *data12 = testData[datoProcesar]; //
-        // string data3 = data12;
-        // char messageType[] = "$GPGGA";
-        // datoProcesar = (datoProcesar + 1) % 15; // Lectura ciclica de los datos de prueba
-        // if (memcmp(messageType, data12, sizeof(messageType) - 1))
-        // {
-        //     return;
-        // }
-        //string data = gpsController_->getData();
-        //Serial.println(data.c_str());
-        //if (data.c_str())
-        //{
-        //}
-        string data;
-        if(gpsController_->getData(&data)) {
-            sdController_->appendFile(data);
-        }
+        sdController_->appendFile(data);
     }
     if (wifiController_->isConnected())
     {
@@ -68,7 +34,8 @@ void Core::loop()
             data << "{ \"new_items\":[";
             data << sdController_->readFile(coordinate);
             coordinate++;
-            while (coordinate < sdController_->getNumberOfData() && coordinate - lastCoordinateTransmitted < 10){
+            while (coordinate < sdController_->getNumberOfData() && coordinate - lastCoordinateTransmitted < 10)
+            {
                 data << ",";
                 data << sdController_->readFile(coordinate);
                 coordinate++;
@@ -97,7 +64,6 @@ unsigned char *Core::formatGps(const unsigned char *raw_data)
         return 0;
     }
 
-    
     // Documentacion: https://www.winsystems.com/wp-content/uploads/software/nmea.pdf
     // Ejemplo
     // $GPGGA,012010.813,5231.067,N,01323.931,E,1,12,1.0,0.0,M,0.0,M,,*6A\r\n,

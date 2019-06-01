@@ -16,8 +16,6 @@
 #include "SD.h"
 #include "SPI.h"
 #include <string>
-#include <sstream>
-#include <iomanip>
 
 using namespace handlers;
 using namespace std;
@@ -91,16 +89,7 @@ void SDController::appendFile(string data)
         Serial.println("Failed to open file for appending");
         return;
     }
-    // unsigned char *dato = new unsigned char[this->dataSize];
-    // size_t dataSize = strlen(data);
-    // memcpy(dato, data, dataSize);
-    // while (dataSize < this->dataSize)
-    // {
-    //     dato[dataSize] = ' ';
-    //     dataSize++;
-    // }
-    // if (file.write(dato, this->dataSize))
-    if (file.write((unsigned char*)paddedData.c_str(), dataSize))
+    if (file.write((unsigned char *)paddedData.c_str(), dataSize))
     {
         lastDataStore++;
         Serial.println("Message appended");
