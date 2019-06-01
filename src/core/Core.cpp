@@ -5,54 +5,61 @@
 
 using namespace core;
 
-Core::Core(WiFiController *wifiController, SDController *sdController, GPSController *gpsController)
+Core::Core(WiFiController *wifiController, SDController *sdController, GPSController *gpsController, BTController *btController)
 {
     wifiController_ = wifiController;
     sdController_ = sdController;
     gpsController_ = gpsController;
+    btController_ = btController;
     lastCoordinateTransmitted = 0;
     sendingData = false;
 }
 
 void Core::loop()
 {
-    string data;
-    if (gpsController_->getData(&data))
+    if (false) // SWITCH DE CONFIGURACION ACTIVADO
     {
-        sdController_->appendFile(data);
-    }
-    if (wifiController_->isConnected())
-    {
-        if (!sendingData)
+        string data;
+        if (gpsController_->getData(&data))
         {
-            sendingData = wifiController_->getLastCoordinateTransmitted(&lastCoordinateTransmitted);
+            sdController_->appendFile(data);
         }
-        if (sendingData && sdController_->getNumberOfData() > lastCoordinateTransmitted)
+        if (wifiController_->isConnected())
         {
-            int coordinate = lastCoordinateTransmitted;
-            stringstream data;
-            data << "{ \"new_items\":[";
-            data << sdController_->readFile(coordinate);
-            coordinate++;
-            while (coordinate < sdController_->getNumberOfData() && coordinate - lastCoordinateTransmitted < 10)
+            if (!sendingData)
             {
-                data << ",";
+                sendingData = wifiController_->getLastCoordinateTransmitted(&lastCoordinateTransmitted);
+            }
+            if (sendingData && sdController_->getNumberOfData() > lastCoordinateTransmitted)
+            {
+                int coordinate = lastCoordinateTransmitted;
+                stringstream data;
+                data << "{ \"new_items\":[";
                 data << sdController_->readFile(coordinate);
                 coordinate++;
+                while (coordinate < sdController_->getNumberOfData() && coordinate - lastCoordinateTransmitted < 10)
+                {
+                    data << ",";
+                    data << sdController_->readFile(coordinate);
+                    coordinate++;
+                }
+                data << "],\"total\":";
+                data << (coordinate - lastCoordinateTransmitted);
+                data << "}";
+                if (wifiController_->sendData(data.str()))
+                {
+                    lastCoordinateTransmitted = coordinate;
+                }
             }
-            data << "],\"total\":";
-            data << (coordinate - lastCoordinateTransmitted);
-            data << "}";
-            if (wifiController_->sendData(data.str()))
-            {
-                lastCoordinateTransmitted = coordinate;
-            }
+        }
+        else
+        {
+            wifiController_->tryToConnect();
+            sendingData = false;
         }
     }
     else
     {
-        wifiController_->tryToConnect();
-        sendingData = false;
     }
 }
 

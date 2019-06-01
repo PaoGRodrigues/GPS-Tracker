@@ -2,6 +2,7 @@
 #include "handlers/WiFiController.hpp"
 #include "handlers/SDController.hpp"
 #include "handlers/GPSController.hpp"
+#include "handlers/BTController.hpp"
 #include "core/Core.hpp"
 
 using namespace handlers;
@@ -19,7 +20,8 @@ void setup()
   wifiController->setAccessPoint(ssid, password);
   SDController *sdController = new SDController();
   GPSController *gpsController = new GPSController();
-  core_ = new core::Core(wifiController, sdController, gpsController);
+  BTController *btController = new BTController();
+  core_ = new core::Core(wifiController, sdController, gpsController, btController);
 }
 
 void loop()
