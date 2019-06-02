@@ -7,42 +7,23 @@
 using namespace handlers;
 using namespace std;
 
-#define READ_SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-#define READ_CHARACTERISTIC_UUID "7fb78cd6-4fa2-4289-8da4-fa4785e90658"
-#define WRITE_SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914c"
-#define WRITE_CHARACTERISTIC_UUID "7fb78cd6-4fa2-4289-8da4-fa4785e90659"
-
 BTController::BTController(string *ssid, string *password)
 {
-  BLEDevice::init("BLE Server");
-  // Create the BLE Server
-  BLEServer *pServer = BLEDevice::createServer();
-  BLEService *readService = pServer->createService(READ_SERVICE_UUID);
-  readCharacteristic_ = readService->createCharacteristic(READ_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ);
-  BLEService *writeService = pServer->createService(WRITE_SERVICE_UUID);
-  writeCharacteristic_ = writeService->createCharacteristic(WRITE_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
-  pServer->setCallbacks(this);
-  readService->start();
-  writeService->start();
-  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-  pAdvertising->addServiceUUID(READ_SERVICE_UUID);
-  pAdvertising->addServiceUUID(WRITE_SERVICE_UUID);
-  pAdvertising->setScanResponse(true);
-  pAdvertising->setMinPreferred(0x06);
-  pAdvertising->setMinPreferred(0x12);
+  ssid_ = ssid;
+  password_ = password;
+  BLEDevice::init("GPS Tracker Config");
+  BLEServer_ = BLEDevice::createServer();
+  onConfigCharacteristic_ = createCharacteristic(ONCONFIG_SERVICE_UUID, ONCONFIG_CHARACTERISTIC_UUID, onConfigDefaultValue_, new OnConfigHandler(this));
+  createCharacteristic(SSID_SERVICE_UUID, SSID_CHARACTERISTIC_UUID, string(ssid_->c_str()), new SSIDHandler(this));
+  createCharacteristic(PASSWORD_SERVICE_UUID, PASSWORD_CHARACTERISTIC_UUID, password_->c_str(), new PasswordHandler(this));
+  BLEAdvertising *advertising = BLEDevice::getAdvertising();
+  advertising->setScanResponse(true);
+  advertising->setMinPreferred(0x06);
+  advertising->setMinPreferred(0x12);
+  advertising->addServiceUUID(ONCONFIG_SERVICE_UUID);
+  advertising->addServiceUUID(SSID_SERVICE_UUID);
+  advertising->addServiceUUID(PASSWORD_SERVICE_UUID);
   BLEDevice::startAdvertising();
-}
-
-void BTController::onConnect(BLEServer *pServer)
-{
-  Serial.println("Alguien se conecto");
-  BLEClientConnected_ = true;
-};
-
-void BTController::onDisconnect(BLEServer *pServer)
-{
-  Serial.println("Alguien se desconecto");
-  BLEClientConnected_ = false;
 }
 
 void BTController::listenForConfig(unsigned long timeout)
@@ -50,19 +31,69 @@ void BTController::listenForConfig(unsigned long timeout)
   unsigned long now = millis();
   unsigned long tiempoLimite = now + timeout * 1000;
   Serial.println("InicioEspera");
-  while (millis() < tiempoLimite)
+  // Espera hasta que se llegue al timeout o se desactive la configuracion, lo que pase despues
+  while (millis() < tiempoLimite || onConfig_)
   {
+    delay(1000);
   }
   Serial.println("FinEspera");
+  BLEDevice::deinit(true);
 }
 
-string BTController::readData()
+BLECharacteristic *BTController::createCharacteristic(const char *serviceUUID, const char *characteristicUUID, string initialValue, BLECharacteristicCallbacks *handler)
 {
-  if (BLEClientConnected_)
-  {
-    string value = writeCharacteristic_->getValue();
-    Serial.println(value.c_str());
-    readCharacteristic_->setValue(value);
-  }
-  return "";
+  BLEService *service = BLEServer_->createService(serviceUUID);
+  BLECharacteristic *characteristic = service->createCharacteristic(characteristicUUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
+  characteristic->setValue(initialValue);
+  characteristic->setCallbacks(handler);
+  service->start();
+  return characteristic;
+}
+
+BTController::OnConfigHandler::OnConfigHandler(BTController *BTController)
+{
+  BTController_ = BTController;
+}
+
+void BTController::OnConfigHandler::onRead(BLECharacteristic *onConfigCharacteristic)
+{
+}
+
+void BTController::OnConfigHandler::onWrite(BLECharacteristic *onConfigCharacteristic)
+{
+  Serial.println(onConfigCharacteristic->getValue().c_str());
+  bool onConfig = BTController_->onConfigDefaultValue_.compare(onConfigCharacteristic->getValue());
+  BTController_->onConfig_ = onConfig;
+}
+
+BTController::SSIDHandler::SSIDHandler(BTController *BTController)
+{
+  BTController_ = BTController;
+}
+
+void BTController::SSIDHandler::onRead(BLECharacteristic *SSIDCharacteristic)
+{
+}
+
+void BTController::SSIDHandler::onWrite(BLECharacteristic *SSIDCharacteristic)
+{
+  Serial.println(SSIDCharacteristic->getValue().c_str());
+  string ssid = SSIDCharacteristic->getValue();
+  *(BTController_->ssid_) = ssid;
+}
+
+BTController::PasswordHandler::PasswordHandler(BTController *BTController)
+{
+  BTController_ = BTController;
+}
+
+void BTController::PasswordHandler::onRead(BLECharacteristic *passwordCharacteristic)
+{
+}
+
+void BTController::PasswordHandler::onWrite(BLECharacteristic *passwordCharacteristic)
+{
+  Serial.println(passwordCharacteristic->getValue().c_str());
+  string password = passwordCharacteristic->getValue();
+  *(BTController_->password_) = password;
 }
