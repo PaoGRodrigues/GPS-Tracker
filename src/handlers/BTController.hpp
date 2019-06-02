@@ -21,8 +21,8 @@ public:
 private:
   BLEDevice *ESP_BT;
   bool _BLEClientConnected = false;
-  char *SERVICE_UUID;
-  BLECharacteristic *pCharacteristic;
+  BLECharacteristic *readCharacteristic_;
+  BLECharacteristic *writeCharacteristic_;
 };
 
 } // namespace handlers

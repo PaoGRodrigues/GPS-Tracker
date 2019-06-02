@@ -60,6 +60,7 @@ void Core::loop()
     }
     else
     {
+        btController_->readData();
     }
 }
 
