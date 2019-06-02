@@ -10,19 +10,23 @@ using namespace std;
 class BTController : public BLEServerCallbacks
 {
 public:
-  BTController();
-  // Recibe el nombre del BT
-  virtual void setup(char *nombre);
-  // Lee la data enviada por el device
-  virtual string readData();
+  BTController(string *ssid, string *password);
+  // Espera a ser configurado, timeout: Tiempo en segundos que espera antes de devolver los valores default
+  virtual void listenForConfig(unsigned long timeout);
+  // Callbacks del BLEServer
   virtual void onConnect(BLEServer *pServer);
   virtual void onDisconnect(BLEServer *pServer);
 
 private:
-  BLEDevice *ESP_BT;
-  bool _BLEClientConnected = false;
+  string readData();
+
+  BLEDevice *BLEDevice_;
   BLECharacteristic *readCharacteristic_;
   BLECharacteristic *writeCharacteristic_;
+
+  bool BLEClientConnected_ = false;
+  string *ssid_;
+  string *password_;
 };
 
 } // namespace handlers

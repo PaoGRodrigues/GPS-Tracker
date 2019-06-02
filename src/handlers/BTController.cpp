@@ -12,7 +12,7 @@ using namespace std;
 #define WRITE_SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914c"
 #define WRITE_CHARACTERISTIC_UUID "7fb78cd6-4fa2-4289-8da4-fa4785e90659"
 
-BTController::BTController()
+BTController::BTController(string *ssid, string *password)
 {
   BLEDevice::init("BLE Server");
   // Create the BLE Server
@@ -36,24 +36,29 @@ BTController::BTController()
 void BTController::onConnect(BLEServer *pServer)
 {
   Serial.println("Alguien se conecto");
-  _BLEClientConnected = true;
+  BLEClientConnected_ = true;
 };
 
 void BTController::onDisconnect(BLEServer *pServer)
 {
   Serial.println("Alguien se desconecto");
-  _BLEClientConnected = false;
+  BLEClientConnected_ = false;
 }
 
-void BTController::setup(char *nombre)
+void BTController::listenForConfig(unsigned long timeout)
 {
-  Serial.begin(9600); //Inicio del Serial monitor en 9600
-  Serial.println("Bluetooth Device is Ready to Pair");
+  unsigned long now = millis();
+  unsigned long tiempoLimite = now + timeout * 1000;
+  Serial.println("InicioEspera");
+  while (millis() < tiempoLimite)
+  {
+  }
+  Serial.println("FinEspera");
 }
 
 string BTController::readData()
 {
-  if (_BLEClientConnected)
+  if (BLEClientConnected_)
   {
     string value = writeCharacteristic_->getValue();
     Serial.println(value.c_str());

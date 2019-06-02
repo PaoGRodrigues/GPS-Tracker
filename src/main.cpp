@@ -16,12 +16,14 @@ void setup()
 {
   Serial.begin(115200);
   delay(4000);
+  GPSController *gpsController = new GPSController();
+  BTController *btController = new BTController(&ssid, &password);
+  unsigned long configTimeout = 30;
+  btController->listenForConfig(configTimeout);
   wifiController = new WiFiController();
   wifiController->setAccessPoint(ssid, password);
   SDController *sdController = new SDController();
-  GPSController *gpsController = new GPSController();
-  BTController *btController = new BTController();
-  core_ = new core::Core(wifiController, sdController, gpsController, btController);
+  core_ = new core::Core(wifiController, sdController, gpsController);
 }
 
 void loop()
