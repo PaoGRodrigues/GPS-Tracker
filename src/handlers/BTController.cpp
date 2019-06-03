@@ -40,11 +40,11 @@ void BTController::listenForConfig(unsigned long timeout)
   Serial.print("Config:");
   Serial.println(onConfigCharacteristic_->getValue().c_str());
   Serial.print("SSID:");
-  Serial.println(ssidCharacteristic_->getValue().c_str());
   *ssid_ = ssidCharacteristic_->getValue();
+  Serial.println(ssid_->c_str());
   Serial.print("Password:");
-  Serial.println(passwordCharacteristic_->getValue().c_str());
   *password_ = passwordCharacteristic_->getValue();
+  Serial.println(password_->c_str());
   Serial.println("FinEspera");
   BLEDevice::deinit(true);
 }
