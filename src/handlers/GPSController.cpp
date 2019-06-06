@@ -21,7 +21,7 @@ string GPSController::createJson(string GPSString)
 {
     // Documentacion: https://www.winsystems.com/wp-content/uploads/software/nmea.pdf
     // Ejemplo
-    // $GPGGA,012010.813,5231.067,N,01323.931,E,1,12,1.0,0.0,M,0.0,M,,*6A\r\n,
+    // $GPRMC,012010.813,5231.067,N,01323.931,E,1,12,1.0,0.0,M,0.0,M,,*6A\r\n,
     // !LOS VALORES DECIMALES DESPUES DEL PUNTO SON OPCIONALES, VALIDAR CON NUESTRO GPS!
     // Dato, Posicion, longitud
     // Fecha, 7, 10
@@ -31,9 +31,9 @@ string GPSController::createJson(string GPSString)
     // Este-Oeste, 39, 1
     // LongitudTotal 29
 
-    string keys[16] = {"{\"$GPRMC\":\"", "\",\"horario\":\"", "\",\"estado\":\"", "\",\"latitud\":\"", "\",\"latitudhemisferio\":\"",
-                       "\",\"longitud\":\"", "\",\"longitudhemisferio\":\"", "\",\"velocidadtierra\":\"", "\",\"track\":\"", "\",\"diacalendario\":\"",
-                       "\",\"variacionmagnetica\":\"", "\",\"variaciondireccion\":\"", "\",\"posicionsistema\":\"", "\",\"checksum\":\""};
+    string keys[16] = {"{\"$GPRMC\":\"", "\",\"time\":\"", "\",\"status\":\"", "\",\"latitude\":\"", "\",\"latitudeHemispherio\":\"",
+                       "\",\"longitude\":\"", "\",\"longitudeHemispherio\":\"", "\",\"earthVelocity\":\"", "\",\"track\":\"", "\",\"date\":\"",
+                       "\",\"magneticVariation\":\"", "\",\"directionVariation\":\"", "\",\"systemPosition\":\"", "\",\"checksum\":\""};
     String gpsString = GPSString.c_str();
     int from = 0;
     String value = "";
