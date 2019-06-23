@@ -9,6 +9,7 @@ using namespace handlers;
 
 std::string ssid = "gps_tracker";
 std::string password = "test1234";
+std::string user = "GPSTrackerUser";
 WiFiController *wifiController;
 core::Core *core_;
 
@@ -17,13 +18,13 @@ void setup()
   Serial.begin(115200);
   delay(4000);
   GPSController *gpsController = new GPSController();
-  BTController *btController = new BTController(&ssid, &password);
+  BTController *btController = new BTController(&ssid, &password, &user);
   unsigned long configTimeout = 30;
   btController->listenForConfig(configTimeout);
   wifiController = new WiFiController();
   wifiController->setAccessPoint(ssid, password);
   SDController *sdController = new SDController();
-  core_ = new core::Core(wifiController, sdController, gpsController);
+  core_ = new core::Core(wifiController, sdController, gpsController, &user);
 }
 
 void loop()

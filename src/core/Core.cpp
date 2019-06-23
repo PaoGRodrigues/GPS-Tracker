@@ -5,11 +5,12 @@
 
 using namespace core;
 
-Core::Core(WiFiController *wifiController, SDController *sdController, GPSController *gpsController)
+Core::Core(WiFiController *wifiController, SDController *sdController, GPSController *gpsController, string* user)
 {
     wifiController_ = wifiController;
     sdController_ = sdController;
     gpsController_ = gpsController;
+    user_ = user;
     lastCoordinateTransmitted = 0;
     sendingData = false;
 }
@@ -31,7 +32,9 @@ void Core::loop()
         {
             int coordinate = lastCoordinateTransmitted;
             stringstream data;
-            data << "{ \"new_items\":[";
+            data << "{ \"user\":\"";
+            data << user_->c_str();
+            data << "\",\"frames\":[";
             data << sdController_->readFile(coordinate);
             coordinate++;
             while (coordinate < sdController_->getNumberOfData() && coordinate - lastCoordinateTransmitted < 10)
