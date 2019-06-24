@@ -1,5 +1,7 @@
 #include "GPSController.hpp"
 #include "HardwareSerial.h"
+#include "string"
+#include "sstream"
 
 using namespace handlers;
 using namespace std;
@@ -12,71 +14,71 @@ GPSController::GPSController()
     gps_serial.begin(9600);
 }
 
-bool GPSController::isUpdated()
-{
-    return false;
-}
-
-string GPSController::createJson(string GPSString)
+string GPSController::createJson(string GPSString, int frameNumber)
 {
     // Documentacion: https://www.winsystems.com/wp-content/uploads/software/nmea.pdf
-    // Ejemplo
-    // $GPRMC,012010.813,5231.067,N,01323.931,E,1,12,1.0,0.0,M,0.0,M,,*6A\r\n,
-    // !LOS VALORES DECIMALES DESPUES DEL PUNTO SON OPCIONALES, VALIDAR CON NUESTRO GPS!
-    // Dato, Posicion, longitud
-    // Fecha, 7, 10
-    // Latitud, 18, 8
-    // Norte-Sur, 27, 1
-    // Longitud, 29, 9
-    // Este-Oeste, 39, 1
-    // LongitudTotal 29
+    // Ejemplo: $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
 
-    string keys[16] = {"{\"$GPRMC\":\"", "\",\"time\":\"", "\",\"status\":\"", "\",\"latitude\":\"", "\",\"latitudeHemispherio\":\"",
-                       "\",\"longitude\":\"", "\",\"longitudeHemispherio\":\"", "\",\"earthVelocity\":\"", "\",\"track\":\"", "\",\"date\":\"",
-                       "\",\"magneticVariation\":\"", "\",\"directionVariation\":\"", "\",\"systemPosition\":\"", "\",\"checksum\":\""};
-    String gpsString = GPSString.c_str();
-    int from = 0;
-    String value = "";
-    int pos = 0;
-    String temp = "";
-
-    while (from != -1)
+    int indexes[12];
+    indexes[0] = 0;
+    for (int i = 0; i < 11; i++)
     {
-        int to = gpsString.indexOf(",", from);
-        if (to != -1)
-        {
-            value = gpsString.substring(from, to);
-            to += 1;
-        }
-        else
-        {
-            value = gpsString.substring(from);
-        }
-        String key = keys[pos].c_str();
-        pos++;
-        temp += key + value;
-        from = to;
+        indexes[i + 1] = GPSString.find(",", indexes[i]) + 1;
     }
-    temp += "\"}";
-    return temp.c_str();
+
+    stringstream value;
+    value << "{\"TrackNumber\":\"" << frameNumber
+          << "\",\"Time\":\"" << GPSString.substr(indexes[1], indexes[2] - indexes[1] - 1)
+          << "\",\"Status\":\"" << GPSString.substr(indexes[2], indexes[3] - indexes[2] - 1);
+
+    const char *latitudeString = GPSString.substr(indexes[3], indexes[4] - indexes[3] - 1).c_str();
+    const char *latitudeHemisphere = GPSString.substr(indexes[4], indexes[5] - indexes[4] - 1).c_str();
+    float latitude = atof(latitudeString) / 100;
+    int intLat = atoi(latitudeString);
+    float floatLat = ((latitude - intLat) / 60) * 100;
+    latitude = (intLat + floatLat);
+    if (strcmp(latitudeHemisphere, "N"))
+    {
+        latitude = -latitude;
+    }
+    value << "\",\"Latitude\":\"" << latitude << "\",\"LongitudeHemisphere\":\"" << latitudeHemisphere;
+
+    const char *longitudeString = GPSString.substr(indexes[5], indexes[6] - indexes[5] - 1).c_str();
+    const char *longitudeHemisphere = GPSString.substr(indexes[6], indexes[7] - indexes[6] - 1).c_str();
+    float longitude = atof(longitudeString) / 100;
+    int intLon = atoi(longitudeString);
+    float floatLon = ((longitude - intLon) / 60) * 100;
+    longitude = (intLon + floatLon);
+    if (strcmp(longitudeHemisphere, "E"))
+    {
+        longitude = -longitude;
+    }
+    value << "\",\"Longitude\":\"" << longitude << "\",\"LatitudeHemisphere\":\"" << longitudeHemisphere;
+
+    value << "\",\"EarthVelocity\":\"" << GPSString.substr(indexes[7], indexes[8] - indexes[7] - 1)
+          << "\",\"Track\":\"" << GPSString.substr(indexes[8], indexes[9] - indexes[8] - 1)
+          << "\",\"Date\":\"" << GPSString.substr(indexes[9], indexes[10] - indexes[9] - 1)
+          << "\",\"MagneticVariation\":\"" << GPSString.substr(indexes[10], indexes[11] - indexes[10] - 1);
+
+    value << "\",\"DirectionVariation\":\"" << GPSString.substr(indexes[11], 1);
+    value << "\",\"SystemPosition\":\"\",\"Checksum\":\"" << GPSString.substr(indexes[11] + 1, 3) << "\"}";
+    Serial.println(value.str().c_str());
+    return value.str().c_str();
 }
 
-bool GPSController::getData(string *data)
+bool GPSController::getData(string *data, int frameNumber)
 {
     bool newData = false;
 
-    // Serial.println("START----------");
-    // Serial.println(gps_serial.available());
     if (gps_serial.available())
     {
         string readed = gps_serial.readStringUntil('\r').c_str();
         gps_serial.read();
-        // Serial.println(readed.c_str());
         newData = readed.compare(lastMessage) != 0 && validarTrama(readed);
         if (newData)
         {
             lastMessage = readed;
-            *data = createJson(readed);
+            *data = createJson(readed, frameNumber);
         }
     }
     return newData;

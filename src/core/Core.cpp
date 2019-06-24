@@ -18,7 +18,7 @@ Core::Core(WiFiController *wifiController, SDController *sdController, GPSContro
 void Core::loop()
 {
     string data;
-    if (gpsController_->getData(&data))
+    if (gpsController_->getData(&data, sdController_->getNumberOfData()))
     {
         sdController_->appendFile(data);
     }
