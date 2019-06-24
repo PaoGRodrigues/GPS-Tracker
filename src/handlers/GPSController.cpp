@@ -34,26 +34,26 @@ string GPSController::createJson(string GPSString, int frameNumber)
     const char *latitudeString = GPSString.substr(indexes[3], indexes[4] - indexes[3] - 1).c_str();
     const char *latitudeHemisphere = GPSString.substr(indexes[4], indexes[5] - indexes[4] - 1).c_str();
     float latitude = atof(latitudeString) / 100;
-    int intLat = atoi(latitudeString);
+    int intLat = static_cast<int>(latitude);
     float floatLat = ((latitude - intLat) / 60) * 100;
     latitude = (intLat + floatLat);
     if (strcmp(latitudeHemisphere, "N"))
     {
         latitude = -latitude;
     }
-    value << "\",\"Latitude\":\"" << latitude << "\",\"LongitudeHemisphere\":\"" << latitudeHemisphere;
+    value << "\",\"Latitude\":\"" << latitude << "\",\"LatitudeHemisphere\":\"" << latitudeHemisphere;
 
     const char *longitudeString = GPSString.substr(indexes[5], indexes[6] - indexes[5] - 1).c_str();
     const char *longitudeHemisphere = GPSString.substr(indexes[6], indexes[7] - indexes[6] - 1).c_str();
     float longitude = atof(longitudeString) / 100;
-    int intLon = atoi(longitudeString);
+    int intLon = static_cast<int>(longitude);
     float floatLon = ((longitude - intLon) / 60) * 100;
     longitude = (intLon + floatLon);
     if (strcmp(longitudeHemisphere, "E"))
     {
         longitude = -longitude;
     }
-    value << "\",\"Longitude\":\"" << longitude << "\",\"LatitudeHemisphere\":\"" << longitudeHemisphere;
+    value << "\",\"Longitude\":\"" << longitude << "\",\"LongitudeHemisphere\":\"" << longitudeHemisphere;
 
     value << "\",\"EarthVelocity\":\"" << GPSString.substr(indexes[7], indexes[8] - indexes[7] - 1)
           << "\",\"Track\":\"" << GPSString.substr(indexes[8], indexes[9] - indexes[8] - 1)
