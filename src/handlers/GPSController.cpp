@@ -27,8 +27,8 @@ string GPSController::createJson(string GPSString, int frameNumber)
     }
 
     stringstream value;
-    value << "{\"TrackNumber\":\"" << frameNumber
-          << "\",\"Time\":\"" << GPSString.substr(indexes[1], indexes[2] - indexes[1] - 1)
+    value << "{\"TrackNumber\":" << frameNumber
+          << ",\"Time\":\"" << GPSString.substr(indexes[1], indexes[2] - indexes[1] - 1)
           << "\",\"Status\":\"" << GPSString.substr(indexes[2], indexes[3] - indexes[2] - 1);
 
     const char *latitudeString = GPSString.substr(indexes[3], indexes[4] - indexes[3] - 1).c_str();
